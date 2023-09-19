@@ -1,0 +1,35 @@
+base_url = "https://syedzayyan.com"
+title = "Syed Zayyan Masud"
+description = "A personal portfolio/blog website of Syed Zayyan Masud"
+
+theme = "shadharon"
+
+build_search_index = true
+
+generate_feed = true
+compile_sass = true
+minify_html = true
+
+taxonomies = [
+    {name = "tags", feed = true},
+]
+
+[markdown]
+highlight_code = true
+highlight_theme = "css"
+
+[extra]
+toc = true
+use_cdn = false
+favicon = "/menu_icon/profile_pic.png"
+headerImage = "/menu_icon/profile_pic.png"
+
+menu = [
+    { name = "Projects", url = "/projects", weight = 1, icon = "projects.png" },
+    { name = "About", url = "/about", weight = 2, icon = "profile_pic.png" },
+]
+
+socials = [
+    { name = "youtube", url = "https://youtube.com/@zayyanmasud", icon = "youtube" },
+    { name = "github", url = "https://github.com/syedzayyan/", icon = "github" },
+]
