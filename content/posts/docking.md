@@ -39,8 +39,8 @@ list_of_residues = list(range(1002, 1110 + 1)) # Residue IDs worth removing
 
 for chain in structure.get_chains():
     for res in chain.get_residues():
-        if res.id in list_of_residues:
-            chain.detach_child(res)
+        if res.id[1] in list_of_residues:
+            chain.detach_child(res.id)
 
 pdbio.set_structure(structure)
 pdbio.save('./5N2S_rem_cyt.pdb')
