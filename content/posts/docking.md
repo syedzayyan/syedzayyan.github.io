@@ -6,7 +6,7 @@ date="2023-09-19T23:00:01.000Z"
 tags = ["tutorials"]
 +++
 
-Autodock likes it's protein and ligand file in PDBQT formats, which sort of a pain to do if you are on a MacOS machine. Thus everything from here is Linux related. I have been very lucky to get access to an HPC, but you should be able to do this on a Raspberry Pi or even PythonAnywhere as they have access to bash!
+Autodock likes its protein and ligand file in PDBQT formats, which is sort of a pain to do if you are on a MacOS machine. Thus everything from here is Linux related. I have been very lucky to get access to an HPC, but you should be able to do this on a Raspberry Pi or even PythonAnywhere as they have access to bash! 
 
 ### Downloading the protein and processing it.
 
@@ -22,7 +22,7 @@ Remove ligands and stuff and only keep proteins
 grep ATOM 5N2S.pdb > 5N2S_rem.pdb
 ```
 
-You can probably clean the receptor more with something like Chimera or BioPython.
+You can probably clean the receptor more with something like BioPython. In our case the receptor is attached to a cytochrome and I would very much like it gone. However, the cytochrome and the receptor are on the same chain.
 
 ### Download ADFR Suite
 
