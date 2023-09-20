@@ -16,13 +16,40 @@ Download the protein. 5N2S can be replaced by your PDB code
 wget http://files.rcsb.org/download/5N2S.pdb
 ```
 
-Remove ligands and stuff and only keep proteins
+In our case the receptor is attached to a cytochrome and I would very much like it gone. I don't really need any of the cytochrome fluff because that is way outside the ligand binding pocket. We hit a problem again. Usually the cytochrome kind of things are in a different chain. Here there are not. You can use the 3D viewer of the RCSB page and figure which residues are worth removing, and then come back to this code.
+
+```python
+from Bio import PDB
+from Bio.PDB import PDBIO
+
+pdbio = PDBIO()
+parser = PDB.PDBParser(QUIET=True)
+
+structure = parser.get_structure("my_structure", "./5N2S.pdb")
+list_of_residues = list(range(1002, 1110 + 1)) # Residue IDs worth removing
+
+for chain in structure.get_chains():
+    for res in chain.get_residues():
+        if res.id in list_of_residues:
+            chain.detach_child(res)
+
+pdbio.set_structure(structure)
+pdbio.save('./5N2S_rem_cyt.pdb')
+```
+
+If you double click on any of the residues, the ID comes up on the right.
+
+![RSCB Viewer](/img/blog-img/docking/pdbviewer_rscb.png)
+
+### Remove ligands and stuff and only keep proteins
+
+grep is a good text editing magic thing in unix-based systems.
 
 ```bash
 grep ATOM 5N2S.pdb > 5N2S_rem.pdb
 ```
 
-You can probably clean the receptor more with something like BioPython. In our case the receptor is attached to a cytochrome and I would very much like it gone. However, the cytochrome and the receptor are on the same chain.
+
 
 ### Download ADFR Suite
 
