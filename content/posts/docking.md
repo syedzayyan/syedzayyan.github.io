@@ -8,6 +8,15 @@ tags = ["tutorials"]
 
 Autodock likes its protein and ligand file in PDBQT formats, which is sort of a pain to do if you are on a MacOS machine. Thus everything from here is Linux related. I have been very lucky to get access to an HPC, but you should be able to do this on a Raspberry Pi or even PythonAnywhere as they have access to bash! 
 
+### Packages
+
+The pip commands to install some of the packages.
+
+```bash
+pip install biopython
+pip install meeko
+```
+
 ### Downloading the protein and processing it.
 
 Download the protein. 5N2S can be replaced by your PDB code
@@ -120,5 +129,7 @@ Now all you need is to run a docking program. There are many tutorials:
 - [Autodock GPU](https://www.kaggle.com/code/syedzayyanmasud/adora-docks-duds/settings?scriptVersionId=141909183)
 - [Vina](https://autodock-vina.readthedocs.io/en/latest/docking_basic.html#preparing-the-receptor)
 - [Smina](https://projects.volkamerlab.org/teachopencadd/talktorials/T015_protein_ligand_docking.html)
+
+I may add one of my own to the pile someday!
 
 Have fun 😊
