@@ -1,6 +1,6 @@
 +++
 title="Temporal Point Processes and Screaming Neighbours"
-date="2026-02-11T23:00:01.000Z"
+date="2026-02-11T14:00:01.000Z"
 
 [taxonomies] 
 tags = ["tutorial?"]
@@ -185,7 +185,6 @@ def train_hawkes(model, times, epochs=400):
 
 ### RMTPP MODEL (Recurrent Marked TPP, simplified univariate)
 <!---->
-##### Step 1
 So far, Hawkes assumed memory decays exponentially. But what if your neighbour’s emotional state is not exponential? Instead of hard-coding the memory kernel, we can let a neural network learn it.
 
 That is RMTPP.
