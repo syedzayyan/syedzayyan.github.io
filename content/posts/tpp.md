@@ -245,7 +245,7 @@ class RMTPP(nn.Module):
         return ll
 ```
 
-### 4. TRAINING (Hawkes + RMTPP)
+### TRAINING (Hawkes + RMTPP)
 
 ```python {.marimo}
 def train_rmtpp(model, times, epochs=600):
