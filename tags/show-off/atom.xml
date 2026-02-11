@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>Syed Zayyan Masud - show off</title>
+	<subtitle>A personal portfolio&#x2F;blog website of Syed Zayyan Masud</subtitle>
+	<link href="https://syedzayyan.com/tags/show-off/atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="https://syedzayyan.com"/>
+	<generator uri="https://www.getzola.org/">Zola</generator>
+	<updated>2021-02-18T08:15:51+00:00</updated>
+	<id>https://syedzayyan.com/tags/show-off/atom.xml</id>
+	<entry xml:lang="en">
+		<title>Making a Weather Station in Raspberry Pi</title>
+		<published>2021-02-18T08:15:51+00:00</published>
+		<updated>2021-02-18T08:15:51+00:00</updated>
+		<link rel="alternate" href="https://syedzayyan.com/posts/raspi-weather-station/" type="text/html"/>
+		<id>https://syedzayyan.com/posts/raspi-weather-station/</id>
+		<content type="html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;&#x2F;h1&gt;
+&lt;p&gt;I got my Raspberry Pi Zero W last year. Since then it had been 
+collecting dust. I should have considered my experience with programming
+and the few stints that had happened along the way before making such 
+an impulse buy. But, hey! That&#x27;s why they are called impulses. However, 
+COVID happened, and Coursera was almost free for half the year. I 
+enrolled in a bunch of courses, I built a few things along the way, 
+including the website you are on right now. I thought of giving the Pi 
+another try.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-shopping&quot;&gt;The Shopping&lt;&#x2F;h1&gt;
+&lt;p&gt;I got inspired to build a weather station from this Reddit &lt;a href=&quot;https:&#x2F;&#x2F;www.reddit.com&#x2F;r&#x2F;raspberry_pi&#x2F;comments&#x2F;nrus9l&#x2F;i_too_built_uteharguss_weather_station_and_it_is&#x2F;&quot;&gt;post&lt;&#x2F;a&gt;. I got onto Pi Hut again. I bought:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;thepihut.com&#x2F;products&#x2F;gpio-header-for-raspberry-pi-a-b-pi-2-pi-3-pi-4-zero&quot;&gt;A header, because I didn’t have headers on my Pi&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;thepihut.com&#x2F;products&#x2F;1-14-ips-lcd-display-module-240x135?variant=39693670252739&quot;&gt;An LCD display, A 1.14 inch tiny WaveShare LCD display&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;thepihut.com&#x2F;products&#x2F;ethernet-and-usb-hub-hat-for-raspberry-pi?variant=31844897488958&quot;&gt;A network HAT&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;thepihut.com&#x2F;products&#x2F;rj45-cat5e-ethernet-lan-cable-2m-black?variant=20063167578174&quot;&gt;An ethernet cable&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;thepihut.com&#x2F;products&#x2F;miniature-5v-cooling-fan-for-raspberry-pi-and-other-computers?variant=31955934417&quot;&gt;A cute little fan&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h1 id=&quot;tan-tan-tana-problem&quot;&gt;Tan tan tana!! Problem.&lt;&#x2F;h1&gt;
+&lt;p&gt;A very ultra silly mistake too. I didn’t have a soldering iron. Don’t
+be me and try to bend the around pins by hand. The contacts are 
+unstable and it just does not work. I did not take a picture to torture 
+your eyes and partly because I did not plan that I was going to make a 
+blog post. And the project got side-lined. I got busy doing other 
+things. But on Prime Day, Pi Hut also offered free delivery. &lt;&#x2F;p&gt;
+&lt;h1 id=&quot;solution&quot;&gt;Solution ?&lt;&#x2F;h1&gt;
+&lt;p&gt;Luckily there are these &lt;a href=&quot;https:&#x2F;&#x2F;thepihut.com&#x2F;products&#x2F;gpio-hammer-header-solderless?variant=28950933073&quot;&gt;hammer headers&lt;&#x2F;a&gt;
+for people like me who can’t solder to save their lives. If you don’t 
+like the sound of hammering your Pi, buy them with pre-soldered headers.
+Again don’t be me. &lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-coding-phase&quot;&gt;The coding phase&lt;&#x2F;h1&gt;
+&lt;p&gt;I thought I could copy the code from u&#x2F;tehargus, with some minor 
+adjustments. But being the miser I am I bought a different cheaper mini 
+LCD display. Fortunately Waveshare had a bunch of guides on their 
+website, and I ditched the code from u&#x2F;tehargus. 
+The &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;syedzayyan&#x2F;pi_weather&quot;&gt;code&lt;&#x2F;a&gt; is pretty self explanatory. It has an infinite loop up top that runs every 
+100 seconds. It consumes the Open Weather API and prints the contents to
+the screen. Specifically the:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Minimum and Maximum temperatures for the day&lt;&#x2F;li&gt;
+&lt;li&gt;What it feels like&lt;&#x2F;li&gt;
+&lt;li&gt;The current temperature&lt;&#x2F;li&gt;
+&lt;li&gt;The probability of rain&lt;&#x2F;li&gt;
+&lt;li&gt;Prints the CPU temperature. Not from the API, (duh!).&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;The code requires a .env file as it requires:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;API_KEY&lt;&#x2F;li&gt;
+&lt;li&gt;LOCATION&lt;&#x2F;li&gt;
+&lt;li&gt;LATITUDE&lt;&#x2F;li&gt;
+&lt;li&gt;LONGITUDE&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;At the end of the loop there&#x27;s a 100 second sleep because in the free
+version Open Weather only allows 1000 API calls a day. If I did my 
+calculation right 100 seconds intervals should be enough.
+Perks of copying code&lt;&#x2F;p&gt;
+&lt;p&gt;The folder structure is complicated. I know. Font and Lib came from 
+Waveshare tutorials. I didn’t touch it because I was scared to break 
+things again. The pic folder contains the pictures from OpenWeather to 
+be displayed. The main folder contains main.py with the actual code. You
+can tinker around if you’d like. :)
+Here’s the finished product. &lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;img&#x2F;blog-img&#x2F;raspi-weather&#x2F;raspi_weather.jpg&quot; alt=&quot;Pi Weather Box&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-case&quot;&gt;The case.&lt;&#x2F;h1&gt;
+&lt;p&gt;You might be asking why it’s in a Seagate One Touch Hard Disk box, 
+with a fan and ethernet port that only consumes an API. Because it’s 
+connected to a 2TB hard drive that’s inside.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;img src=&quot;&#x2F;img&#x2F;blog-img&#x2F;raspi-weather&#x2F;inside_peak.jpg&quot; alt=&quot;Sneak Peak in Pi Weather Box&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;poorly-written-golang&quot;&gt;Poorly written Golang&lt;&#x2F;h1&gt;
+&lt;p&gt;The Pi also runs an HTTP File server I wrote in Golang. Here’s
+the &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;syedzayyan&#x2F;pi-file-server&quot;&gt;code&lt;&#x2F;a&gt; for it. Maybe I’d write about it some other day when I am well
+versed with Golang. But in short it has a bunch of API endpoints that 
+can be used for reading, putting and deleting files on the disk. A 
+SvelteJS frontend consumes those APIs.
+So, if you have a Pi, don’t let it collect dust. It’s a powerful 
+little machine that can do just about anything you can imagine. Probably
+not running your machine learning algorithms, but a weather station is a
+start!&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;P.S The Pi also runs Pi Hole. That’s why the fan and CPU temp reading to keep it cool.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+</content>
+	</entry>
+</feed>

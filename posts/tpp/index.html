@@ -1,0 +1,210 @@
+<!doctype html><html lang=en><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="width=device-width,initial-scale=1.0" name=viewport><title> Temporal Point Processes and Screaming Neighbours </title><link href=/menu_icon/profile_pic.png rel=icon type=image/png><link href="https://syedzayyan.com/ atom.xml" title="Syed Zayyan Masud" rel=alternate type=application/atom+xml><link href=https://syedzayyan.com/main.css media=screen rel=stylesheet><meta content="A personal portfolio/blog website of Syed Zayyan Masud" name=description><meta content="A personal portfolio/blog website of Syed Zayyan Masud" name=description><meta content="index, nofollow" name=robots><meta content="Syed Zayyan Masud" property=og:title><meta content=article property=og:type><meta content=/menu_icon/profile_pic.png property=og:image><meta content=/menu_icon/profile_pic.png name=twitter:card><meta content=https://syedzayyan.com/posts/tpp/ property=og:url><meta content="A personal portfolio/blog website of Syed Zayyan Masud" property=og:description><meta content="Syed Zayyan Masud" property=og:site_name><meta content="default-src 'self' ws://127.0.0.1:1024/; img-src 'self' https://*; script-src 'self'; style-src 'self'; font-src 'self'" http-equiv=Content-Security-Policy><body><header><div class=navbar><div class="nav-title nav-navs"><a class="nav-links home-title" href=https://syedzayyan.com>Syed Zayyan Masud</a></div><nav class="nav-title nav-navs"><a class=nav-links href=/projects> <img alt=Projects height=15 src=/menu_icon/projects.png width=15> Projects</a><a class=nav-links href=/about> <img alt=About height=15 src=/menu_icon/profile_pic.png width=15> About</a></nav><nav class="socials nav-navs"><label class=theme-switcher for=themeswitch><div class=background></div> <input id=themeswitch type=checkbox> <div class=switch><img alt="theme switch to dark" class=moon src=/menu_icon/moon.png><img alt="theme switch to light" class=sun src=/menu_icon/sun.png></div></label></nav></div></header><div class=content><main><article><div class=title><h2>Temporal Point Processes and Screaming Neighbours</h2><div class=meta>Posted on <time>2026-02-11</time><div class=post-tags><nav class="nav tags">🏷: <a href=https://syedzayyan.com/tags/tutorial/>tutorial?</a>  </nav></div> ||<span> 8 minute read</span></div></div><h1>Table of Contents</h1><ul><li><a href=https://syedzayyan.com/posts/tpp/#problem>Problem</a><li><a href=https://syedzayyan.com/posts/tpp/#simulate-scream-data>SIMULATE SCREAM DATA</a> <ul><li><a href=https://syedzayyan.com/posts/tpp/#finally-the-hawkes-processes>Finally the, Hawkes Processes</a></ul><li><a href=https://syedzayyan.com/posts/tpp/#parametric-hawkes-baseline>PARAMETRIC HAWKES BASELINE</a><li><a href=https://syedzayyan.com/posts/tpp/#rmtpp-model-recurrent-marked-tpp-simplified-univariate>RMTPP MODEL (Recurrent Marked TPP, simplified univariate)</a><li><a href=https://syedzayyan.com/posts/tpp/#training-hawkes-rmtpp>TRAINING (Hawkes + RMTPP)</a><li><a href=https://syedzayyan.com/posts/tpp/#plot-results>PLOT RESULTS</a></ul><section class=body><p>I have been investigating into time-series models and landed onto Temporal Point Process one fine day. This world mostly concerts itself with finance and I am not a finance person or a statistics person. This is a tutorial or more appropiately my thoughts on how all of this works. Before I move along here is the problem we will be working with today.<h3 id=problem>Problem</h3><p>The issue at hand is my neighbour screams loudly everyday. Once only in a day but almost all days of the year. To simulate my neighbour doing professional neighbouring I am using a <strong>Hawkes Process</strong>. I will be using <strong>Recurrent Marked Temporal Processes</strong> to predict when my neighbour is going to scream again next, so that I am prepare.<pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">import torch
+import torch.nn as nn
+import torch.optim as optim
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import poisson
+import torch.nn.functional as F
+</span></code></pre><pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+</span></code></pre><h3 id=simulate-scream-data>SIMULATE SCREAM DATA</h3><p>Before I explain what Hawkes Processes are, some background information is in order.<p><strong>Stochastic processes</strong> are defined as (often infinite) collections of random variables, indexed by some time or space. In our case it is time, formalizing a model for the “discrete-time” data above, we could write {Xt}∞t=0,t∈Z+. A random variate, or a realization of the process is the entire trajectory determined by values taken by all Xt (often part of which we observe). In other words the scream, they are random, hence random variables. ⭐⭐⭐ <em>statistics</em>. Here Xt make up the collection while Z+ is the index set. The specific dependence (or rather, independence) structure, and other parametric assumptions of relationships among {Xt} determine the stochastic process.<p>A <strong>Counting processes</strong> is a stochastic process { N ( t ) , t ≥ 0 } {\displaystyle {N(t),t\geq 0}} with values that are non-negative, integer, and non-decreasing. In other words we count the number of screams in a day.<p>A <strong>Poisson Process</strong> is a counting process with quirks. Quirks being:<ul><li>We define a Poisson process with a function λ(t)>0,∀t<li>Say we have two intervals, A,B⊂R The number of occurrences in these intervals will be Poisson distributed with N(A)∼∫Aλ(t)dt, and N(B)∼∫Bλ(t)dt<li>Most importantly, N(A),N(B) are independent variables for all A∩B=∅<li>Higher intensity functions λ(t)as expected, are associated with higher probabilities of event occurrences.</ul><p>Imagine the neighbour screams because they are arguing. Arguments rarely end in one shout. One scream makes another scream more likely shortly after. But if a few calm days pass, the probability resets to baseline.<p><strong>Self-Exciting Processes</strong> Now we allow events to influence future events. One scream increases the probability of another scream shortly after.But that influence decays over time. That’s called self-excitation. If neighbour screams because they are arguing:<ul><li>First scream → increases probability of second scream.<li>After a few calm days → back to normal baseline.</ul><p>Memory exists, but it fades.<h5 id=finally-the-hawkes-processes>Finally the, Hawkes Processes</h5><p>The (univariate) Hawkes process is defined by the conditional intensity function<p>λ∗(t)=μ+∑ti&LTtφ(t−ti).<p>At any moment t, the conditional intensity function is at least μ>0, the background intensity. However, it also depends linearly on effects of events that have occurred before time t. Namely, this dependence is through a triggering kernel function φ(.), a function of the delay t−ti between the current time and the timestamp of the previous event. Note that φ is nonnegative (φ(x)≥0,∀x≥0 and causal φ(x)=0,∀x&LT0. It is usually a monotonically decreasing function (such as exponential decay, or power-law decay).<p>Thinking the other way around, the function can be interpreted as follows. Everytime neighbour screams, they'll scream more in the next days. <em>Self Exciting</em> called bursts. Probably, if they are sad, they'll remain sad for a while?<pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">def simulate_hawkes(T=365.0, mu=0.4, alpha=0.8, beta=1.5, seed=42):
+    np.random.seed(seed)
+    t = 0.0
+    events = []
+
+    while t < T:
+        if len(events) == 0:
+            lambda_bar = mu
+        else:
+            lambda_bar = mu + alpha * np.sum(np.exp(-beta * (t - np.array(events))))
+
+        u = np.random.rand()
+        w = -np.log(u) / lambda_bar
+        t += w
+
+        if t >= T:
+            break
+
+        lambda_t = mu + alpha * np.sum(np.exp(-beta * (t - np.array(events))))
+        d = np.random.rand()
+
+        if d * lambda_bar <= lambda_t:
+            events.append(t)
+
+    return np.array(events)
+
+# Generate full data
+true_times = simulate_hawkes()
+gap_start, gap_end = 100.0, 130.0  # 30-day logger gap
+latent_times = true_times[(true_times >= gap_start) & (true_times < gap_end)]
+latent_count = len(latent_times)
+obs_times = np.concatenate([
+    true_times[true_times < gap_start],
+    true_times[true_times >= gap_end]
+])
+
+print(f"True screams: {len(true_times)}, Observed: {len(obs_times)}, Latent in gap: {latent_count}")
+</span></code></pre><p>Yes my neighbour seems to scream a lot<pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">plt.figure(figsize=(12, 3))
+
+# Event (raster) plot
+plt.plot(true_times, np.zeros_like(true_times), '|', markersize=12)
+
+plt.xlabel("Time (days)")
+plt.yticks([])
+plt.title("Simulated Neighbour Screams (Hawkes Process)")
+
+plt.tight_layout()
+plt.show()
+</span></code></pre><h3 id=parametric-hawkes-baseline>PARAMETRIC HAWKES BASELINE</h3><pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">class Hawkes(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.mu = nn.Parameter(torch.tensor(0.3))
+        self.alpha = nn.Parameter(torch.tensor(0.5))
+        self.beta = nn.Parameter(torch.tensor(1.0))
+
+    def intensity(self, t, history):
+        past = history[history < t]
+        if len(past) == 0:
+            return self.mu
+        return self.mu + self.alpha * torch.sum(
+            torch.exp(-self.beta * (t - past))
+        )
+
+    def integral(self, a, b, history):
+        mu_part = self.mu * (b - a)
+        past = history[history < b]
+
+        if len(past) == 0:
+            return mu_part
+
+        decay_a = torch.sum(torch.exp(-self.beta * (a - past)))
+        decay_b = torch.sum(torch.exp(-self.beta * (b - past)))
+        exc = (self.alpha / self.beta) * (decay_a - decay_b)
+
+        return mu_part + exc
+
+    def log_likelihood(self, times):
+        ll = 0.0
+        prev_t = torch.tensor(0.0, device=times.device)
+
+        for i, t in enumerate(times):
+            lamb = self.intensity(t, times[:i])
+            integ = self.integral(prev_t, t, times[:i])
+            ll += torch.log(lamb + 1e-8) - integ
+            prev_t = t
+
+        # subtract integral to T
+        T = times[-1]
+        ll -= self.integral(prev_t, T, times)
+
+        return ll
+
+
+def train_hawkes(model, times, epochs=400):
+    optimizer = optim.Adam(model.parameters(), lr=0.05)
+    times_t = torch.tensor(times, dtype=torch.float32, device=device)
+
+    for e in range(epochs):
+        optimizer.zero_grad()
+        ll = model.log_likelihood(times_t)
+        loss = -ll
+        loss.backward()
+        optimizer.step()
+
+        if e % 100 == 0:
+            print("Hawkes NLL:", -ll.item())
+
+    br = model.alpha.item() / model.beta.item()
+    print("Branching ratio α/β:", br)
+</span></code></pre><h3 id=rmtpp-model-recurrent-marked-tpp-simplified-univariate>RMTPP MODEL (Recurrent Marked TPP, simplified univariate)</h3><p>So far, Hawkes assumed memory decays exponentially. But what if your neighbour’s emotional state is not exponential? Instead of hard-coding the memory kernel, we can let a neural network learn it.<p>That is RMTPP.<p>We observe inter-event times: $$ \tau_j = t_j - t_{j-1} $$ These are fed into an RNN (typically an LSTM), producing hidden states: $$ h_j = \mathrm{RNN}(h_{j-1}, \tau_j) $$<p>The hidden state $h_j$ is a learned summary of the entire past. This replaces the explicit Hawkes kernel. The <a href=https://www.kdd.org/kdd2016/papers/files/rpp1081-duA.pdf>original paper</a> is a way better resource. Please head over there if you want more insights.<table><thead><tr><th>Hawkes<th>RMTPP<tbody><tr><td>Exponential memory kernel<td>Learned memory<tr><td>Interpretable parameters<td>Black box<tr><td>Parametric<td>Neural<tr><td>Stable if α/β < 1<td>Stability learned implicitly</table><pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">class RMTPP(nn.Module):
+    def __init__(self, hidden_dim=32):
+        super().__init__()
+        self.lstm = nn.LSTM(1, hidden_dim, batch_first=True)
+        self.v = nn.Linear(hidden_dim, 1)
+        self.w = nn.Parameter(torch.tensor(0.1))
+        self.b = nn.Parameter(torch.tensor(0.0))
+
+    def forward_history(self, deltas):
+        deltas = deltas.unsqueeze(-1)
+        out, _ = self.lstm(deltas)
+        return out
+
+    def intensity(self, h, tau):
+        return torch.exp(self.v(h) + self.w * tau + self.b)
+
+    def log_density(self, h, tau):
+        a = self.v(h) + self.b
+        w = self.w
+
+        lamb = torch.exp(a + w * tau)
+        integral = (torch.exp(a) / w) * (torch.exp(w * tau) - 1)
+
+        return torch.log(lamb + 1e-8) - integral
+
+    def log_likelihood(self, deltas):
+        h_all = self.forward_history(deltas.unsqueeze(0))[0]
+
+        ll = 0.0
+        for j in range(1, len(deltas)):
+            h_prev = h_all[j - 1]
+            tau = deltas[j]
+            ll += self.log_density(h_prev, tau)
+
+        return ll
+</span></code></pre><h3 id=training-hawkes-rmtpp>TRAINING (Hawkes + RMTPP)</h3><pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">def train_rmtpp(model, times, epochs=600):
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+    deltas = np.diff(np.concatenate([[0.0], times]))
+    deltas_t = torch.tensor(deltas, dtype=torch.float32, device=device)
+
+    for e in range(epochs):
+        optimizer.zero_grad()
+        ll = model.log_likelihood(deltas_t)
+        loss = -ll
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        optimizer.step()
+
+        if e % 150 == 0:
+            print("RMTPP NLL:", -ll.item())
+
+def sample_rmtpp_next(model, times):
+    deltas = np.diff(np.concatenate([[0.0], times]))
+    deltas_t = torch.tensor(deltas, dtype=torch.float32, device=device)
+
+    h_all = model.forward_history(deltas_t.unsqueeze(0))[0]
+    h_last = h_all[-1]
+
+    a = model.v(h_last) + model.b
+    w = model.w
+
+    u = torch.rand(1, device=device)
+
+    tau = (1.0 / w) * torch.log(
+        1 - (w / torch.exp(a)) * torch.log(1 - u)
+    )
+
+    return tau.item()
+</span></code></pre><pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">hawkes = Hawkes().to(device)
+train_hawkes(hawkes, true_times)
+
+rmtpp = RMTPP().to(device)
+train_rmtpp(rmtpp, true_times)
+
+next_tau = sample_rmtpp_next(rmtpp, true_times)
+print("Predicted next scream in ~", next_tau, "days")
+</span></code></pre><h3 id=plot-results>PLOT RESULTS</h3><pre class="language-python {.marimo} z-code" data-lang="python {.marimo}"><code class="language-python {.marimo}" data-lang="python {.marimo}"><span class="z-text z-plain">t_eval = np.linspace(true_times[-1], true_times[-1] + 10, 200)
+history_t = torch.tensor(true_times, dtype=torch.float32)
+
+hawkes_int = [
+    hawkes.intensity(torch.tensor(t), history_t).item()
+    for t in t_eval
+]
+
+plt.figure(figsize=(10,5))
+plt.plot(t_eval, hawkes_int)
+plt.title("Hawkes Predicted Intensity")
+plt.xlabel("Time")
+plt.ylabel("Intensity")
+plt.show()
+</span></code></pre><p>References:<ul><li>https://shchur.github.io/blog/2020/tpp1-conditional-intensity/<li>https://hawkeslib.readthedocs.io/en/latest/tutorial.html#footnote-reference-1<li>https://en.wikipedia.org/wiki/Counting_process</ul></section></article></main></div><footer><section><nav><a class="nav-links social" rel="noopener noreferrer" href=https://youtube.com/@zayyanmasud target=_blank> <img alt=youtube src=/social_icons/youtube.svg title=youtube> </a><a class="nav-links social" rel="noopener noreferrer" href=https://github.com/syedzayyan/ target=_blank> <img alt=github src=/social_icons/github.svg title=github> </a></nav><nav><span classname=desktop-only>This blog is powered by <a rel="noopener noreferrer" href=https://getzola.org/ target=_blank>Zola</a> with theme by <a rel="noopener noreferrer" href=https://syedzayyan.com/ target=_blank>SZM</a></span></nav></section><script src=https://syedzayyan.com/js/main.js></script></footer>
